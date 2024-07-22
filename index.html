@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .container h1 {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCUUabZ_pDb0C1dezzuyBVzP6Ut7XpWo0s",
+  authDomain: "form-e74ab.firebaseapp.com",
+  databaseURL: "https://form-e74ab-default-rtdb.firebaseio.com",
+  projectId: "form-e74ab",
+  storageBucket: "form-e74ab.appspot.com",
+  messagingSenderId: "93811294360",
+  appId: "1:93811294360:web:6bfcd40b7a4fe2524cd0ed",
+  measurementId: "G-GV55PBD71V"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to log IP address and location
+        function logIPAddress(ip, location) {
+            const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
+            set(ref(database, 'ipAddresses/' + timestamp), {
+                ip: ip,
+                location: location,
+                timestamp: new Date().toISOString()
+            }).then(() => {
+                document.getElementById('response').innerText = 'IP and location logged!';
+            }).catch((error) => {
+                console.error('Error logging IP address:', error);
+                document.getElementById('response').innerText = 'Error: ' + error.message;
+            });
+        }
+
+        // Fetch user's IP address and location
+        fetch('https://ipinfo.io/json?token=d63b09de191d25')
+            .then(response => response.json())
+            .then(data => {
+                const ip = data.ip;
+                const location = {
+                    city: data.city,
+                    region: data.region,
+                    country: data.country
+                };
+                logIPAddress(ip, location);
+            })
+            .catch(error => {
+                console.error('Error fetching location:', error);
+                document.getElementById('response').innerText = 'Error fetching location: ' + error.message;
+            });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <p id="response">Logging IP and location...</p>
+    </div>
+</body>
+</html>
