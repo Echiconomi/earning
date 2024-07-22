@@ -32,14 +32,14 @@
 
         // Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyCUUabZ_pDb0C1dezzuyBVzP6Ut7XpWo0s",
-  authDomain: "form-e74ab.firebaseapp.com",
-  databaseURL: "https://form-e74ab-default-rtdb.firebaseio.com",
-  projectId: "form-e74ab",
-  storageBucket: "form-e74ab.appspot.com",
-  messagingSenderId: "93811294360",
-  appId: "1:93811294360:web:6bfcd40b7a4fe2524cd0ed",
-  measurementId: "G-GV55PBD71V"
+            apiKey: "AIzaSyBoGo963CApg7rxnJ2Z2v5BETZlU2weQnQ",
+            authDomain: "all-in-one-database.firebaseapp.com",
+            databaseURL: "https://all-in-one-database-default-rtdb.firebaseio.com",
+            projectId: "all-in-one-database",
+            storageBucket: "all-in-one-database.appspot.com",
+            messagingSenderId: "586125993756",
+            appId: "1:586125993756:web:5c4ffc97122342ce6afcd9",
+            measurementId: "G-NM8XT3QTWG"
         };
 
         // Initialize Firebase
@@ -47,35 +47,71 @@
         const database = getDatabase(app);
 
         // Function to log IP address and location
-        function logIPAddress(ip, location) {
+        function logLocation(ip, location, locationName) {
             const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
-            set(ref(database, 'ipAddresses/' + timestamp), {
+            set(ref(database, 'locations/' + timestamp), {
                 ip: ip,
                 location: location,
+                locationName: locationName,
                 timestamp: new Date().toISOString()
             }).then(() => {
-                document.getElementById('response').innerText = 'IP and location logged!';
+                document.getElementById('response').innerText = 'IP, location, and location name logged!';
             }).catch((error) => {
-                console.error('Error logging IP address:', error);
+                console.error('Error logging location:', error);
                 document.getElementById('response').innerText = 'Error: ' + error.message;
             });
         }
 
+        // Function to get location name from coordinates
+        function getLocationName(lat, lon) {
+            return fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    return data.display_name || 'Unknown location';
+                })
+                .catch(error => {
+                    console.error('Error fetching location name:', error);
+                    return 'Error fetching location name';
+                });
+        }
+
         // Fetch user's IP address and location
-        fetch('https://ipinfo.io/json?token=d63b09de191d25')
+        fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
                 const ip = data.ip;
-                const location = {
-                    city: data.city,
-                    region: data.region,
-                    country: data.country
-                };
-                logIPAddress(ip, location);
+                // Get the user's location using the Geolocation API
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const location = {
+                            latitude: latitude,
+                            longitude: longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        // Get the location name
+                        getLocationName(latitude, longitude).then(locationName => {
+                            logLocation(ip, location, locationName);
+                        });
+                    }, error => {
+                        console.error('Error fetching location:', error);
+                        // Handle denied geolocation
+                        if (error.code === error.PERMISSION_DENIED) {
+                            document.getElementById('response').innerText = 'Location access denied. IP address logged.';
+                            logLocation(ip, {latitude: null, longitude: null, accuracy: null}, 'Location access denied');
+                        } else {
+                            document.getElementById('response').innerText = 'Error fetching location: ' + error.message;
+                        }
+                    });
+                } else {
+                    document.getElementById('response').innerText = 'Geolocation is not supported by this browser.';
+                    logLocation(ip, {latitude: null, longitude: null, accuracy: null}, 'Geolocation not supported');
+                }
             })
             .catch(error => {
-                console.error('Error fetching location:', error);
-                document.getElementById('response').innerText = 'Error fetching location: ' + error.message;
+                console.error('Error fetching IP address:', error);
+                document.getElementById('response').innerText = 'Error fetching IP address: ' + error.message;
             });
     </script>
 </head>
