@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Invitation</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: pink;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      color: #ff4081;
+    }
+    .button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #ff4081;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #noBtn {
+      position: absolute;
+    }
+    .celebration {
+      display: none;
+      font-size: 24px;
+      color: #ff4081;
+      margin-top: 20px;
+      animation: appear 1s ease forwards;
+    }
+    @keyframes appear {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .hearts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .heart {
+      color: #ff4081;
+      font-size: 24px;
+      animation: float 1s ease infinite alternate;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Can I take you on a date?</h1>
+    <button class="button" id="yesBtn" onclick="showCelebration()">Yes</button>
+    <button class="button" id="noBtn" onclick="moveNoButton()">No</button>
+    <div class="celebration" id="celebration">
+      Yehey! ❤️💖💕
+      <div class="hearts" id="hearts">
+        ❤️ 💖 💕 💘 💞 💓 💝 💗
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const celebration = document.getElementById('celebration');
+
+    function moveNoButton() {
+      const randomX = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+      const randomY = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
+    }
+
+    function showCelebration() {
+      celebration.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
